@@ -13,7 +13,7 @@ if not GEMINI_KEY:
 
 genai.configure(api_key=GEMINI_KEY)
 
-# 2. 최신 지원 모델로 수정 완료 (404 에러 해결)
+# 2. 최신 지원 모델 사용
 model = genai.GenerativeModel('gemini-2.5-flash')
 
 def collect_data():
@@ -22,7 +22,7 @@ def collect_data():
     return sources
 
 def generate_report(data):
-    # 3. 날짜 오류 해결: 오늘을 기준으로 '지난주 월~일'의 정확한 날짜 계산
+    # 오늘을 기준으로 '지난주 월~일'의 정확한 날짜 계산
     today = datetime.now()
     last_monday = today - timedelta(days=today.weekday() + 7)
     last_sunday = last_monday + timedelta(days=6)
@@ -81,5 +81,10 @@ def save_to_html(content):
 
 if __name__ == "__main__":
     raw_info = collect_data()
+    
+    # [새로 추가된 부분] 수집된 원본 데이터를 텍스트 파일로 저장합니다.
+    with open("raw_data_log.txt", "w", encoding="utf-8") as f:
+        f.write(raw_info)
+        
     report_text = generate_report(raw_info)
     save_to_html(report_text)
