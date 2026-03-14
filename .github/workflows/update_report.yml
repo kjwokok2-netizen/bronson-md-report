@@ -17,7 +17,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-      - name: Run script
+- name: Run script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # 이 줄을 추가해서 금고 키를 연결합니다.
         run: python main.py
       - name: Commit and Push changes
         run: |
