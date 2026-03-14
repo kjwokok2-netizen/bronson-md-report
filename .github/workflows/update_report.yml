@@ -2,25 +2,30 @@ name: Weekly Trend Report Update
 
 on:
   schedule:
-    - cron: '0 0 * * 1' # 매주 월요일 오전 9시 (KST 기준)
-  workflow_dispatch: # 수동 실행 버튼 생성
+    - cron: '0 0 * * 1' # 매주 월요일 오전 9시 (한국 시간 기준)
+  workflow_dispatch: # 수동으로 'Run workflow' 버튼을 만들어주는 설정입니다.
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
+
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-- name: Run script
+
+      - name: Run script
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # 이 줄을 추가해서 금고 키를 연결합니다.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python main.py
+
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
