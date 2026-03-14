@@ -3,6 +3,7 @@ import requests
 import urllib.request
 import urllib.parse
 import json
+import re
 from bs4 import BeautifulSoup
 import google.generativeai as genai
 from datetime import datetime, timedelta
@@ -16,14 +17,29 @@ if not GEMINI_KEY:
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-# 2. 데이터 수집 모듈 (네이버 & 무신사 통합)
+# 2. 유튜브 검색 결과 수집 (제목 위주)
+def get_youtube_data(keyword):
+    encoded_query = urllib.parse.quote(keyword)
+    url = f"https://www.youtube.com/results?search_query={encoded_query}"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        # 유튜브는 JS 기반이라 정규식으로 비디오 제목 데이터를 일부 추출합니다.
+        titles = re.findall(r'"title":\{"runs":\[\{"text":"([^"]+)"\}', response.text)
+        results = [t for t in titles if len(t) > 5][:5] # 너무 짧은 텍스트 제외
+        return f"[YouTube '{keyword}' 관련 영상]: " + " / ".join(results)
+    except:
+        return ""
+
+# 3. 네이버 통합 검색 (쇼핑, 블로그, 카페글)
 def get_naver_search(keyword, target="shop"):
     client_id = os.environ.get("NAVER_CLIENT_ID")
     client_secret = os.environ.get("NAVER_CLIENT_SECRET")
     if not client_id: return ""
     
     encText = urllib.parse.quote(keyword)
-    url = f"https://openapi.naver.com/v1/search/{target}.json?query={encText}&display=8" # 수집량 증대
+    url = f"https://openapi.naver.com/v1/search/{target}.json?query={encText}&display=10"
     request_obj = urllib.request.Request(url)
     request_obj.add_header("X-Naver-Client-Id", client_id)
     request_obj.add_header("X-Naver-Client-Secret", client_secret)
@@ -33,57 +49,50 @@ def get_naver_search(keyword, target="shop"):
         if response.getcode() == 200:
             data = json.loads(response.read().decode('utf-8'))
             clean = lambda x: x.replace('<b>', '').replace('</b>', '').replace('&quot;', '"').replace('&#39;', "'")
-            return "\n".join([f"- {clean(i['title'])}: {clean(i.get('description', ''))}" for i in data['items']])
+            return "\n".join([f"- {clean(i['title'])}: {clean(i.get('description', ''))[:80]}" for i in data['items']])
     except: return ""
     return ""
 
-# 3. 데이터 취합 (정밀 타겟팅)
+# 4. 데이터 취합 본부 (유튜브 포함)
 def collect_data():
     target_keywords = [
-        "아웃스탠딩 코디", "에스피오나지 자켓", "프리즘웍스 팬츠", "브론슨 의류 품질", # 국내 실질 반응
-        "리얼맥코이 A-2", "버즈릭슨 치노", "웨어하우스 1101", "오어슬로우 105", "오디너리핏츠 앵클", # 해외 디테일
-        "더블알엘 RRL 스타일", "남자 아메카지 코디 추천", "밀리터리 복각 브랜드 비교"
+        "아웃스탠딩", "에스피오나지", "프리즘웍스", "브론슨 의류", # 국내
+        "리얼맥코이", "버즈릭슨", "더블알엘 RRL", "웨어하우스 복각", "오디너리핏츠", # 해외/일본
+        "남자 아메카지 코디", "밀리터리 복각 자켓"
     ]
     all_info = []
     for kw in target_keywords:
-        all_info.append(f"### [RAW DATA: {kw}] ###")
+        all_info.append(f"### [SOURCE: {kw}] ###")
         all_info.append(get_naver_search(kw, "shop"))
-        all_info.append(get_naver_search(kw, "blog"))
-        all_info.append(get_naver_search(kw, "cafearticle"))
+        all_info.append(get_naver_search(kw, "cafearticle")) # 고아캐드, 브랜디드 반응
+        all_info.append(get_youtube_data(kw)) # 유튜브 트렌드
+        all_info.append("\n")
     return "\n".join(all_info)
 
-# 4. 고도화된 전략 리포트 생성 (시니어 MD 페르소나 주입)
+# 5. 시니어 MD 전략 보고서 생성
 def generate_report(data):
     today = datetime.now()
     date_context = f"{(today - timedelta(days=7)).strftime('%Y/%m/%d')} - {today.strftime('%Y/%m/%d')}"
     
     prompt = f"""
-    당신은 패션 업계 15년 차 시니어 MD이자 브랜드 전략 컨설턴트입니다. 
-    제공된 데이터는 지난 7일간의 아메카지/밀리터리 시장의 실시간 데이터입니다. 
-    이 데이터를 바탕으로 '브론슨(Bronson)'의 경영진과 기획팀이 감탄할 만한 '주간 전략 보고서'를 작성하세요.
+    당신은 15년 차 시니어 패션 MD이자 브랜드 전략가입니다.
+    다음 수집된 '유튜브 제목, 카페 게시글, 네이버 쇼핑 데이터'를 바탕으로 브론슨(Bronson) 팀원들에게 공유할 전문 보고서를 작성하세요.
 
-    [데이터 소스]
+    [수집된 원본 데이터]
     {data}
 
-    [보고서 필수 구조 및 내용]
-    1. EXECUTIVE SUMMARY: 이번 주 시장의 핵심 흐름을 한 문장으로 정의하고, 가장 주목해야 할 브랜드 1곳을 선정하세요.
-    2. 브랜드별 심층 분석 (HERITAGE vs DOMESTIC):
-       - 일본/해외 브랜드(맥코이, RRL 등)에서 현재 소비자들이 열광하는 '오리지널리티 디테일'이 무엇인지 분석하세요.
-       - 국내 경쟁사(아웃스탠딩, 에스피오나지, 프리즘웍스)가 현재 밀고 있는 주력 아이템과 소비자들의 실제 구매 만족도/불만 사항을 대조하세요.
-    3. 실무 기획 인사이트 (FABRIC & SILHOUETTE):
-       - 데이터에 언급된 소재(예: 정글클로스, 샴브레이 등)와 실루엣(예: 와이드, 테이퍼드)의 변화를 포착하세요.
-    4. BRONSON'S ACTION PLAN:
-       - '주완 MD'가 이번 주 샘플실에 지시하거나 마케팅팀과 논의해야 할 구체적인 아이템 3가지를 우선순위별로 제안하세요.
+    [보고서 작성 가이드라인]
+    1. 시장 지형 변화 (Global & Domestic): 경쟁 브랜드(에스피오나지 등)와 근본 브랜드(RRL 등)의 현재 시장 온도 차이를 분석하세요.
+    2. 유튜브/커뮤니티 여론 해부: 유튜브에서 유행하는 키워드와 고아캐드/브랜디드에서 소비자들이 가장 많이 질문하는 '고민 사항'을 추출하세요.
+    3. 상품 기획적 통찰: 단순 유행이 아닌, '어떤 소재와 어떤 실루엣'이 다음 주 판매를 견인할지 구체적으로 제안하세요.
+    4. 브론슨(Bronson)을 위한 Critical Action: 주완 MD가 이번 주에 바로 실행해야 할 기획/마케팅 액션 3가지를 우선순위별로 제시하세요.
 
-    [작성 원칙]
-    - 오디너리핏츠는 반드시 '일본 브랜드' 섹션에서 다룰 것.
-    - 데이터에 기반하지 않은 막연한 유행어 사용을 지양하고, 실제 블로그/카페의 반응(VOC)을 인용할 것.
-    - 한국어 비즈니스 문체로 작성하며, HTML 태그를 사용하여 가독성 있게 구성할 것.
+    오디너리핏츠는 일본 브랜드로 명확히 구분하고, 전문 비즈니스 문체를 사용하며 HTML 형식을 갖추어 작성하세요.
     """
     response = model.generate_content(prompt)
     return response.text.replace('```html', '').replace('```', '')
 
-# 5. 전문가용 디자인 적용 HTML
+# 6. 전문가용 프리미엄 UI 디자인
 def save_to_html(content):
     now = datetime.now().strftime('%Y.%m.%d')
     html_template = f"""
@@ -91,35 +100,34 @@ def save_to_html(content):
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <title>Bronson & Seureubi Weekly Intelligence</title>
+        <title>Bronson & Seureubi MD Strategy Insight</title>
         <style>
             @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-            body {{ font-family: 'Pretendard', sans-serif; background-color: #f1f2f6; color: #2f3542; margin: 0; padding: 40px 20px; }}
-            .wrapper {{ max-width: 1100px; margin: auto; background: white; padding: 60px; border-radius: 2px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-top: 10px solid #2f3542; }}
-            .report-header {{ border-bottom: 2px solid #2f3542; padding-bottom: 20px; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; }}
-            .report-header h1 {{ font-size: 2.5em; margin: 0; letter-spacing: -1.5px; text-transform: uppercase; }}
-            .report-header .date {{ font-weight: 700; color: #747d8c; letter-spacing: 1px; }}
-            .section {{ margin-bottom: 60px; }}
-            .section h2 {{ font-size: 1.6em; background: #2f3542; color: white; padding: 10px 20px; display: inline-block; margin-bottom: 25px; border-radius: 0 15px 15px 0; }}
-            .section p, .section li {{ font-size: 1.1em; line-height: 1.9; color: #57606f; }}
-            .insight-box {{ background: #f8f9fa; border-left: 5px solid #ff4757; padding: 30px; margin: 30px 0; border-radius: 4px; }}
-            .insight-box h4 {{ margin-top: 0; color: #ff4757; font-size: 1.2em; }}
-            strong {{ color: #2f3542; }}
-            hr {{ border: 0; border-top: 1px solid #eee; margin: 40px 0; }}
-            .footer {{ text-align: center; color: #ced4da; font-size: 0.9em; margin-top: 80px; }}
+            body {{ font-family: 'Pretendard', sans-serif; background-color: #1e1e1e; color: #e0e0e0; margin: 0; padding: 40px 20px; }}
+            .paper {{ max-width: 1000px; margin: auto; background: #ffffff; color: #333; padding: 70px; border-radius: 4px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); }}
+            .top-bar {{ display: flex; justify-content: space-between; border-bottom: 3px solid #333; padding-bottom: 10px; margin-bottom: 50px; }}
+            .top-bar .title {{ font-size: 0.9em; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }}
+            h1 {{ font-size: 3em; line-height: 1; margin: 20px 0; letter-spacing: -2px; color: #1a1a1a; }}
+            .meta-info {{ color: #999; margin-bottom: 60px; font-size: 0.9em; }}
+            .content h2 {{ font-size: 1.8em; margin-top: 50px; border-bottom: 1px solid #eee; padding-bottom: 15px; color: #c0392b; }}
+            .content p, .content li {{ line-height: 1.8; font-size: 1.1em; color: #444; }}
+            .highlight-box {{ background: #fdf2f2; border-left: 6px solid #c0392b; padding: 30px; margin: 40px 0; }}
+            .footer {{ border-top: 1px solid #eee; margin-top: 100px; padding-top: 20px; text-align: center; color: #ccc; font-size: 0.8em; }}
         </style>
     </head>
     <body>
-        <div class="wrapper">
-            <div class="report-header">
-                <h1>Strategic Intelligence</h1>
-                <div class="date">ISSUE NO. {now}</div>
+        <div class="paper">
+            <div class="top-bar">
+                <div class="title">Bronson & Seureubi Strategy Lab</div>
+                <div class="no">ISSUE NO. {now}</div>
             </div>
+            <h1>WEEKLY<br>MARKET INTELLIGENCE</h1>
+            <div class="meta-info">CONFIDENTIAL REPORT FOR MD TEAM</div>
             <div class="content">
                 {content}
             </div>
             <div class="footer">
-                &copy; 2026 Bronson & Seureubi Brand Strategy Lab. All Rights Reserved.
+                본 보고서는 AI가 실시간 웹 데이터를 분석하여 생성한 브랜딩 전략 자료입니다.
             </div>
         </div>
     </body>
