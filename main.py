@@ -1,5 +1,8 @@
 import os
 import requests
+import urllib.request
+import urllib.parse
+import json
 from bs4 import BeautifulSoup
 import google.generativeai as genai
 from datetime import datetime, timedelta
@@ -13,41 +16,72 @@ if not GEMINI_KEY:
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-# 2. 데이터 수집 모듈 A: 무신사 크롤링 시도 (오류 방어형)
+# 2. 무신사 데이터 수집 (방어형)
 def get_musinsa_data(keyword):
     url = f"https://www.musinsa.com/search/musinsa/goods?q={keyword}"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-    
+    headers = {'User-Agent': 'Mozilla/5.0'}
     try:
         response = requests.get(url, headers=headers, timeout=10)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
-            # 참고: 무신사 HTML 구조 변경 또는 봇 차단 시 빈 값이 나올 수 있음 (추측성 수집)
             items = soup.select('.article_info p.list_info a')
             results = [item.text.strip() for item in items[:5]]
-            
             if results:
-                return f"[무신사 '{keyword}' 상위 노출]: " + ", ".join(results)
+                return f"[무신사 '{keyword}' 상위 상품]: " + ", ".join(results)
             else:
-                return f"[무신사 '{keyword}']: 크롤링이 차단되었거나 스크립트 렌더링으로 인해 데이터를 읽을 수 없습니다."
+                return f"[무신사 '{keyword}']: 동적 렌더링 또는 봇 차단으로 데이터 읽기 실패."
         else:
-            return f"[무신사 '{keyword}']: 서버 접근 실패 (상태 코드: {response.status_code})"
+            return f"[무신사 '{keyword}']: 서버 접근 실패 (코드: {response.status_code})"
     except Exception as e:
-        return f"[무신사 '{keyword}']: 연결 에러 발생 ({e})"
+        return f"[무신사 '{keyword}']: 에러 발생 ({e})"
 
-# 3. 데이터 수집 모듈 B: 네이버 검색 API (키 확인형)
+# 3. 네이버 쇼핑 API 데이터 수집 (실제 가동)
 def get_naver_api_data(keyword):
-    # 깃허브 Secrets에서 네이버 전용 열쇠를 찾습니다.
     client_id = os.environ.get("NAVER_CLIENT_ID")
     client_secret = os.environ.get("NAVER_CLIENT_SECRET")
     
     if not client_id or not client_secret:
-        return f"[네이버 쇼핑/검색 '{keyword}']: 보류됨. (이유: GitHub Secrets에 네이버 API 키가 등록되지 않았습니다.)"
+        return f"[네이버 쇼핑 '{keyword}']: API 키 누락으로 보류됨."
     
-    # 향후 네이버 키가 등록되면 작동할 실제 API 로직 공간
-    return f"[네이버 '{keyword}']: API 연동 준비 완료."
+    encText = urllib.parse.quote(keyword)
+    url = "https://openapi.naver.com/v1/search/shop.json?query=" + encText + "&display=5"
+    
+    request_obj = urllib.request.Request(url)
+    request_obj.add_header("X-Naver-Client-Id", client_id)
+    request_obj.add_header("X-Naver-Client-Secret", client_secret)
+    
+    try:
+        response = urllib.request.urlopen(request_obj)
+        rescode = response.getcode()
+        if rescode == 200:
+            response_body = response.read()
+            data = json.loads(response_body.decode('utf-8'))
+            # <b> 태그 제거 및 상품명 추출
+            items = [item['title'].replace('<b>', '').replace('</b>', '') for item in data['items']]
+            return f"[네이버 쇼핑 '{keyword}' 인기 검색]: " + ", ".join(items)
+        else:
+            return f"[네이버 쇼핑 '{keyword}']: 에러 발생 (상태 코드: {rescode})"
+    except Exception as e:
+        return f"[네이버 쇼핑 '{keyword}']: 호출 실패 ({e})"
 
-# 4. 전체 데이터 취합 본부
+# 4. 구글 트렌드 데이터 수집 (pytrends 라이브러리 활용)
+def get_google_trends(keyword):
+    try:
+        from pytrends.request import TrendReq
+        # 한국 지역 설정으로 구글 트렌드 접속
+        pytrends = TrendReq(hl='ko-KR', tz=540)
+        pytrends.build_payload([keyword], cat=0, timeframe='now 7-d', geo='KR', gprop='')
+        related_queries = pytrends.related_queries()
+        
+        if keyword in related_queries and related_queries[keyword]['top'] is not None:
+            top_queries = related_queries[keyword]['top']['query'].tolist()[:5]
+            return f"[구글 트렌드 '{keyword}' 연관검색어]: " + ", ".join(top_queries)
+        else:
+            return f"[구글 트렌드 '{keyword}']: 유의미한 연관검색어 데이터가 부족합니다."
+    except Exception as e:
+        return f"[구글 트렌드 '{keyword}']: 수집 실패 (해외 IP 차단 가능성 등) - {e}"
+
+# 5. 전체 데이터 취합 본부
 def collect_data():
     target_keywords = ["아메카지", "밀리터리", "프레피"]
     all_collected_info = []
@@ -55,10 +89,11 @@ def collect_data():
     for kw in target_keywords:
         all_collected_info.append(get_musinsa_data(kw))
         all_collected_info.append(get_naver_api_data(kw))
+        all_collected_info.append(get_google_trends(kw))
         
     return "\n".join(all_collected_info)
 
-# 5. 리포트 생성 및 저장 로직
+# 6. 리포트 생성 및 저장 로직
 def generate_report(data):
     today = datetime.now()
     last_monday = today - timedelta(days=today.weekday() + 7)
@@ -77,10 +112,10 @@ def generate_report(data):
     
     [필수 포함 항목]
     1. {date_context} 기준 브랜드별/키워드별 트렌드 요약
-    2. 수집된 데이터를 바탕으로 한 세분화된 핵심 키워드 TOP 10
+    2. 수집된 데이터를 바탕으로 한 세분화된 핵심 키워드 TOP 10 (출처 표기)
     3. 실무자를 위한 상품 기획 인사이트 제안
     
-    브론슨과 스르비의 MD인 '주완'을 위한 형식으로 깔끔하게 작성해.
+    브론슨과 스르비의 MD인 '주완'을 위한 형식으로 객관적이고 전문적으로 작성해.
     """
     response = model.generate_content(prompt)
     return response.text.replace('```html', '').replace('```', '')
