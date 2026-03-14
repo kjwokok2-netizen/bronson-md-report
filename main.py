@@ -2,9 +2,9 @@ import os
 import requests
 from bs4 import BeautifulSoup
 import google.generativeai as genai
-from datetime import datetime, timedelta # timedelta(날짜 계산 도구) 추가
+from datetime import datetime, timedelta
 
-# 1. 설정
+# 1. API 키 설정 (GitHub Secrets 연동)
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY") 
 
 if not GEMINI_KEY:
@@ -12,7 +12,9 @@ if not GEMINI_KEY:
     exit()
 
 genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+
+# 2. 최신 지원 모델로 수정 완료 (404 에러 해결)
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 def collect_data():
     # 실제 수집 로직의 요약 (무신사, 29CM, 커뮤니티 등)
@@ -20,14 +22,14 @@ def collect_data():
     return sources
 
 def generate_report(data):
-    # 오늘 날짜를 기준으로 '지난주 월요일~일요일' 날짜를 정확히 계산
+    # 3. 날짜 오류 해결: 오늘을 기준으로 '지난주 월~일'의 정확한 날짜 계산
     today = datetime.now()
     last_monday = today - timedelta(days=today.weekday() + 7)
     last_sunday = last_monday + timedelta(days=6)
     
     date_context = f"{last_monday.strftime('%Y년 %m월 %d일')} ~ {last_sunday.strftime('%Y년 %m월 %d일')}"
     
-    # AI에게 정확한 날짜를 지시하는 프롬프트로 수정
+    # AI에게 정확한 기간을 지시하는 프롬프트
     prompt = f"""
     현재 기준일: {today.strftime('%Y년 %m월 %d일')}
     분석 대상 기간(지난주): {date_context}
