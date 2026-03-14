@@ -23,7 +23,7 @@ def get_naver_search(keyword, target="shop"):
     if not client_id: return ""
     
     encText = urllib.parse.quote(keyword)
-    url = f"https://openapi.naver.com/v1/search/{target}.json?query={encText}&display=5"
+    url = f"https://openapi.naver.com/v1/search/{target}.json?query={encText}&display=8" # 수집량 증대
     request_obj = urllib.request.Request(url)
     request_obj.add_header("X-Naver-Client-Id", client_id)
     request_obj.add_header("X-Naver-Client-Secret", client_secret)
@@ -32,53 +32,58 @@ def get_naver_search(keyword, target="shop"):
         response = urllib.request.urlopen(request_obj)
         if response.getcode() == 200:
             data = json.loads(response.read().decode('utf-8'))
-            clean = lambda x: x.replace('<b>', '').replace('</b>', '').replace('&quot;', '"')
-            return "\n".join([f"- {clean(i['title'])}: {clean(i.get('description', ''))[:60]}" for i in data['items']])
+            clean = lambda x: x.replace('<b>', '').replace('</b>', '').replace('&quot;', '"').replace('&#39;', "'")
+            return "\n".join([f"- {clean(i['title'])}: {clean(i.get('description', ''))}" for i in data['items']])
     except: return ""
     return ""
 
-# 3. 데이터 취합 (브랜드 타겟팅 정밀화)
+# 3. 데이터 취합 (정밀 타겟팅)
 def collect_data():
     target_keywords = [
-        "아웃스탠딩", "에스피오나지", "프리즘웍스", "브론슨 의류", # 국내 4대장
-        "리얼맥코이", "버즈릭슨", "웨어하우스 복각", "오어슬로우", "오디너리핏츠", # 해외/일본
-        "더블알엘 RRL", "남자 아메카지 코디", "밀리터리 복각 자켓"
+        "아웃스탠딩 코디", "에스피오나지 자켓", "프리즘웍스 팬츠", "브론슨 의류 품질", # 국내 실질 반응
+        "리얼맥코이 A-2", "버즈릭슨 치노", "웨어하우스 1101", "오어슬로우 105", "오디너리핏츠 앵클", # 해외 디테일
+        "더블알엘 RRL 스타일", "남자 아메카지 코디 추천", "밀리터리 복각 브랜드 비교"
     ]
     all_info = []
     for kw in target_keywords:
-        all_info.append(f"### [KEYWORD: {kw}] ###")
+        all_info.append(f"### [RAW DATA: {kw}] ###")
         all_info.append(get_naver_search(kw, "shop"))
         all_info.append(get_naver_search(kw, "blog"))
         all_info.append(get_naver_search(kw, "cafearticle"))
     return "\n".join(all_info)
 
-# 4. 고도화된 전략 리포트 생성 (MD 전용 프롬프트)
+# 4. 고도화된 전략 리포트 생성 (시니어 MD 페르소나 주입)
 def generate_report(data):
     today = datetime.now()
     date_context = f"{(today - timedelta(days=7)).strftime('%Y/%m/%d')} - {today.strftime('%Y/%m/%d')}"
     
     prompt = f"""
-    당신은 글로벌 패션 트렌드 분석가이자 '브론슨(Bronson)'의 수석 브랜드 매니저입니다.
-    다음 원본 데이터를 바탕으로 현업 MD들이 신상품 기획 회의에서 즉시 활용할 수 있는 수준의 '심층 트렌드 분석 리포트'를 작성하세요.
+    당신은 패션 업계 15년 차 시니어 MD이자 브랜드 전략 컨설턴트입니다. 
+    제공된 데이터는 지난 7일간의 아메카지/밀리터리 시장의 실시간 데이터입니다. 
+    이 데이터를 바탕으로 '브론슨(Bronson)'의 경영진과 기획팀이 감탄할 만한 '주간 전략 보고서'를 작성하세요.
 
     [데이터 소스]
     {data}
 
-    [작성 가이드라인]
-    1. 시장 지형도: 국내 도메스틱(아웃스탠딩, 에스피오나지, 프리즘웍스, 브론슨)과 해외/일본 브랜드(맥코이, 웨어하우스, RRL, 오디너리핏츠 등)의 동향을 엄격히 분리하여 분석할 것.
-    2. 마이크로 트렌드 포착: 데이터에서 반복적으로 언급되는 '소재(예: 헤링본, 몰스킨)', '디테일(예: 핀락 지퍼, 튜블러)', '핏(예: 릴렉스 스트레이트)'을 구체적으로 추출할 것.
-    3. 소비자 결핍 분석: 카페나 블로그에서 소비자들이 아쉬워하는 점(가격, 사이즈 품절, 내구성 등)을 찾아내어 브론슨의 기회 요소로 전환할 것.
-    4. MD's Decision: 브론슨 기획팀이 이번 주에 당장 착수해야 할 샘플링 리스트 3가지를 제안할 것.
+    [보고서 필수 구조 및 내용]
+    1. EXECUTIVE SUMMARY: 이번 주 시장의 핵심 흐름을 한 문장으로 정의하고, 가장 주목해야 할 브랜드 1곳을 선정하세요.
+    2. 브랜드별 심층 분석 (HERITAGE vs DOMESTIC):
+       - 일본/해외 브랜드(맥코이, RRL 등)에서 현재 소비자들이 열광하는 '오리지널리티 디테일'이 무엇인지 분석하세요.
+       - 국내 경쟁사(아웃스탠딩, 에스피오나지, 프리즘웍스)가 현재 밀고 있는 주력 아이템과 소비자들의 실제 구매 만족도/불만 사항을 대조하세요.
+    3. 실무 기획 인사이트 (FABRIC & SILHOUETTE):
+       - 데이터에 언급된 소재(예: 정글클로스, 샴브레이 등)와 실루엣(예: 와이드, 테이퍼드)의 변화를 포착하세요.
+    4. BRONSON'S ACTION PLAN:
+       - '주완 MD'가 이번 주 샘플실에 지시하거나 마케팅팀과 논의해야 할 구체적인 아이템 3가지를 우선순위별로 제안하세요.
 
-    [어투]
-    - 매우 전문적이고 분석적이며, 격식 있는 비즈니스 문체를 사용할 것.
-    - 불확실한 데이터는 '추측'임을 명시하고 근거를 제시할 것.
-    - 결과물은 시각적으로 구조화된 HTML 코드로 출력할 것.
+    [작성 원칙]
+    - 오디너리핏츠는 반드시 '일본 브랜드' 섹션에서 다룰 것.
+    - 데이터에 기반하지 않은 막연한 유행어 사용을 지양하고, 실제 블로그/카페의 반응(VOC)을 인용할 것.
+    - 한국어 비즈니스 문체로 작성하며, HTML 태그를 사용하여 가독성 있게 구성할 것.
     """
     response = model.generate_content(prompt)
     return response.text.replace('```html', '').replace('```', '')
 
-# 5. 전문가용 UI 적용 HTML 템플릿
+# 5. 전문가용 디자인 적용 HTML
 def save_to_html(content):
     now = datetime.now().strftime('%Y.%m.%d')
     html_template = f"""
@@ -86,35 +91,35 @@ def save_to_html(content):
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <title>Bronson & Seureubi Strategy Report</title>
+        <title>Bronson & Seureubi Weekly Intelligence</title>
         <style>
             @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-            body {{ font-family: 'Pretendard', sans-serif; background-color: #f4f4f2; color: #1a1a1a; margin: 0; padding: 50px 20px; }}
-            .report-card {{ max-width: 1000px; margin: auto; background: #ffffff; padding: 60px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 8px solid #2c3e50; }}
-            .header {{ border-bottom: 1px solid #eee; padding-bottom: 30px; margin-bottom: 40px; }}
-            .header h1 {{ font-size: 2.2em; letter-spacing: -1px; margin: 0; color: #2c3e50; }}
-            .header .meta {{ color: #888; margin-top: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }}
-            .content h2 {{ font-size: 1.5em; border-left: 4px solid #c0392b; padding-left: 15px; margin: 40px 0 20px; }}
-            .content p, .content li {{ line-height: 1.8; font-size: 1.05em; color: #444; }}
-            .md-action {{ background: #f9f9f9; border: 1px dashed #ddd; padding: 25px; margin-top: 40px; border-radius: 8px; }}
-            .md-action h3 {{ margin-top: 0; color: #c0392b; font-size: 1.2em; }}
-            table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
-            th, td {{ padding: 15px; border-bottom: 1px solid #eee; text-align: left; }}
-            th {{ background: #f8f9fa; color: #666; font-weight: 600; }}
+            body {{ font-family: 'Pretendard', sans-serif; background-color: #f1f2f6; color: #2f3542; margin: 0; padding: 40px 20px; }}
+            .wrapper {{ max-width: 1100px; margin: auto; background: white; padding: 60px; border-radius: 2px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border-top: 10px solid #2f3542; }}
+            .report-header {{ border-bottom: 2px solid #2f3542; padding-bottom: 20px; margin-bottom: 50px; display: flex; justify-content: space-between; align-items: flex-end; }}
+            .report-header h1 {{ font-size: 2.5em; margin: 0; letter-spacing: -1.5px; text-transform: uppercase; }}
+            .report-header .date {{ font-weight: 700; color: #747d8c; letter-spacing: 1px; }}
+            .section {{ margin-bottom: 60px; }}
+            .section h2 {{ font-size: 1.6em; background: #2f3542; color: white; padding: 10px 20px; display: inline-block; margin-bottom: 25px; border-radius: 0 15px 15px 0; }}
+            .section p, .section li {{ font-size: 1.1em; line-height: 1.9; color: #57606f; }}
+            .insight-box {{ background: #f8f9fa; border-left: 5px solid #ff4757; padding: 30px; margin: 30px 0; border-radius: 4px; }}
+            .insight-box h4 {{ margin-top: 0; color: #ff4757; font-size: 1.2em; }}
+            strong {{ color: #2f3542; }}
+            hr {{ border: 0; border-top: 1px solid #eee; margin: 40px 0; }}
+            .footer {{ text-align: center; color: #ced4da; font-size: 0.9em; margin-top: 80px; }}
         </style>
     </head>
     <body>
-        <div class="report-card">
-            <div class="header">
-                <h1>WEEKLY STRATEGY REPORT</h1>
-                <div class="meta">Bronson & Seureubi MD Intelligence / {now} Issued</div>
+        <div class="wrapper">
+            <div class="report-header">
+                <h1>Strategic Intelligence</h1>
+                <div class="date">ISSUE NO. {now}</div>
             </div>
             <div class="content">
                 {content}
             </div>
-            <div class="md-action">
-                <h3>※ MD's Final Decision Note</h3>
-                <p>본 리포트는 네이버 쇼핑/블로그/카페 및 구글 트렌드의 실시간 데이터를 Gemini 2.5 Flash 모델이 분석한 결과입니다. 브랜드 내부 기획 회의 시 참고 자료로 활용하시기 바랍니다.</p>
+            <div class="footer">
+                &copy; 2026 Bronson & Seureubi Brand Strategy Lab. All Rights Reserved.
             </div>
         </div>
     </body>
