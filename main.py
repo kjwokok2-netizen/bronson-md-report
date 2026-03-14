@@ -2,9 +2,9 @@ import os
 import requests
 from bs4 import BeautifulSoup
 import google.generativeai as genai
-from datetime import datetime
+from datetime import datetime, timedelta # timedelta(날짜 계산 도구) 추가
 
-# 1. 설정: 깃허브 금고(Secrets)에서 안전하게 키를 가져옵니다.
+# 1. 설정
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY") 
 
 if not GEMINI_KEY:
@@ -12,8 +12,7 @@ if not GEMINI_KEY:
     exit()
 
 genai.configure(api_key=GEMINI_KEY)
-# 구글의 최신 서비스 버전에 맞춘 모델 이름으로 변경 (핵심 수정!)
-model = genai.GenerativeModel('gemini-2.5-flash')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def collect_data():
     # 실제 수집 로직의 요약 (무신사, 29CM, 커뮤니티 등)
@@ -21,9 +20,21 @@ def collect_data():
     return sources
 
 def generate_report(data):
+    # 오늘 날짜를 기준으로 '지난주 월요일~일요일' 날짜를 정확히 계산
+    today = datetime.now()
+    last_monday = today - timedelta(days=today.weekday() + 7)
+    last_sunday = last_monday + timedelta(days=6)
+    
+    date_context = f"{last_monday.strftime('%Y년 %m월 %d일')} ~ {last_sunday.strftime('%Y년 %m월 %d일')}"
+    
+    # AI에게 정확한 날짜를 지시하는 프롬프트로 수정
     prompt = f"""
+    현재 기준일: {today.strftime('%Y년 %m월 %d일')}
+    분석 대상 기간(지난주): {date_context}
     정보 소스: {data}
-    위 정보를 바탕으로 지난주(월~일) 패션 트렌드 리포트를 작성해줘.
+    
+    위 정보를 바탕으로 반드시 '분석 대상 기간({date_context})'에 해당하는 패션 트렌드 리포트를 작성해줘. 
+    보고서 본문의 날짜는 무작위로 지어내지 말고, 제공된 기간을 정확히 명시해야 해.
     
     [필수 포함 항목]
     1. 아메카지 관련 키워드 TOP 10
