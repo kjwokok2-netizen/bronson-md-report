@@ -1,11 +1,17 @@
-import os
+import os  # 추가됨
 import requests
 from bs4 import BeautifulSoup
 import google.generativeai as genai
 from datetime import datetime
 
 # 1. 설정
-GEMINI_KEY = "YOUAIzaSyBM0hcrgvrMuVyqD1OxgOs9niJ9907Dvnw" # 여기에 API 키 입력
+# os.environ.get을 통해 깃허브 금고(Secrets)에 있는 키를 가져옵니다.
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY") 
+
+if not GEMINI_KEY:
+    print("에러: API 키를 찾을 수 없습니다. Secrets 설정을 확인하세요.")
+    exit()
+
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
