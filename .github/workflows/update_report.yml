@@ -2,8 +2,8 @@ name: Weekly Trend Report Update
 
 on:
   schedule:
-    - cron: '0 0 * * 1' # 매주 월요일 오전 9시 (한국 시간 기준)
-  workflow_dispatch: # 수동으로 'Run workflow' 버튼을 만들어주는 설정입니다.
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -30,6 +30,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git commit -m "Update weekly report" || exit 0
+          git add index.html raw_data_log.txt
+          git commit -m "Update weekly report and raw data log" || exit 0
           git push
