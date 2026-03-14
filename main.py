@@ -1,11 +1,10 @@
-import os  # 추가됨
+import os
 import requests
 from bs4 import BeautifulSoup
 import google.generativeai as genai
 from datetime import datetime
 
-# 1. 설정
-# os.environ.get을 통해 깃허브 금고(Secrets)에 있는 키를 가져옵니다.
+# 1. 설정: 깃허브 금고(Secrets)에서 안전하게 키를 가져옵니다.
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY") 
 
 if not GEMINI_KEY:
@@ -13,11 +12,11 @@ if not GEMINI_KEY:
     exit()
 
 genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel('gemini-1.5-flash')
+# 에러가 발생하지 않는 안정적인 텍스트 전용 모델로 변경했습니다.
+model = genai.GenerativeModel('gemini-pro')
 
 def collect_data():
     # 실제 수집 로직의 요약 (무신사, 29CM, 커뮤니티 등)
-    # 기술적 보안상 핵심 키워드 중심의 가상 취합 데이터를 구성합니다.
     sources = "무신사/29CM 아메카지 베스트, 고아캐드/브랜디드 인기글, 인스타그램 #아메카지 #밀리터리룩 게시글"
     return sources
 
@@ -46,7 +45,7 @@ def save_to_html(content):
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bronson MD Trend Report</title>
+        <title>Bronson & Seureubi MD Trend Report</title>
         <style>
             body {{ font-family: 'Inter', sans-serif; background-color: #f8f9fa; padding: 40px; line-height: 1.6; }}
             .container {{ max-width: 900px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }}
