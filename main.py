@@ -12,8 +12,8 @@ if not GEMINI_KEY:
     exit()
 
 genai.configure(api_key=GEMINI_KEY)
-# 에러가 발생하지 않는 안정적인 텍스트 전용 모델로 변경했습니다.
-model = genai.GenerativeModel('gemini-pro')
+# 구글의 최신 서비스 버전에 맞춘 모델 이름으로 변경 (핵심 수정!)
+model = genai.GenerativeModel('gemini-2.5-flash')
 
 def collect_data():
     # 실제 수집 로직의 요약 (무신사, 29CM, 커뮤니티 등)
@@ -47,7 +47,7 @@ def save_to_html(content):
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Bronson & Seureubi MD Trend Report</title>
         <style>
-            body {{ font-family: 'Inter', sans-serif; background-color: #f8f9fa; padding: 40px; line-height: 1.6; }}
+            body {{ font-family: 'Apple SD Gothic Neo', sans-serif; background-color: #f8f9fa; padding: 40px; line-height: 1.6; }}
             .container {{ max-width: 900px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }}
             h1 {{ color: #1a1a1a; border-left: 5px solid #2c3e50; padding-left: 15px; }}
             .date {{ color: #7f8c8d; margin-bottom: 30px; }}
