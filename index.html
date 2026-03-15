@@ -4,124 +4,137 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Weekly Fashion Trend Ranking</title>
+        <title>Fashion Intelligence Report</title>
         <style>
             @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-            :root { --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21; --accent: #1877f2; --border: #e4e6eb; }
+            :root { --bg: #f4f5f7; --card: #ffffff; --text: #202124; --accent: #2962ff; --highlight: #e8f0fe; --border: #dadce0; }
             body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
-            .container { max-width: 1200px; margin: 0 auto; }
+            .container { max-width: 1100px; margin: 0 auto; }
             
             /* Header */
-            .header-box { background: var(--card); padding: 40px; border-radius: 16px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 40px; border-top: 6px solid #1a1a1a; }
-            .header-box h1 { margin: 0 0 10px 0; font-size: 2.5em; letter-spacing: -1px; font-weight: 800; }
-            .header-box .date { color: #65676b; font-weight: 600; font-size: 1.1em; }
+            .header-box { background: var(--text); color: #fff; padding: 40px 50px; border-radius: 12px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+            .header-box h1 { margin: 0; font-size: 2.2em; letter-spacing: -1px; font-weight: 800; }
+            .header-box .date { font-weight: 600; font-size: 1em; opacity: 0.8; }
 
-            /* Content Grid */
-            .dashboard-content { display: flex; flex-direction: column; gap: 40px; }
+            /* Dashboard Content */
+            .dashboard-content { background: var(--card); padding: 50px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--border); }
             
-            /* Markdown Styling for Ranking Boards */
-            .dashboard-content h2 { text-align: center; font-size: 2em; margin: 40px 0 20px 0; padding-bottom: 15px; border-bottom: 3px solid #1a1a1a; }
-            .dashboard-content h3 { color: var(--accent); font-size: 1.4em; margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; }
-            .dashboard-content ol { background: var(--card); padding: 30px 30px 30px 50px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin: 0; border: 1px solid var(--border); }
-            .dashboard-content li { padding: 12px 0; border-bottom: 1px solid #f1f1f1; font-size: 1.15em; font-weight: 500; color: #333; }
-            .dashboard-content li:last-child { border-bottom: none; padding-bottom: 0; }
+            /* Markdown Styling */
+            .dashboard-content h2 { color: var(--text); font-size: 1.8em; margin: 50px 0 20px 0; padding-bottom: 15px; border-bottom: 2px solid var(--text); }
+            .dashboard-content h2:first-child { margin-top: 0; }
+            .dashboard-content h3 { color: var(--accent); font-size: 1.3em; margin-top: 40px; margin-bottom: 15px; }
             
-            hr { border: 0; border-bottom: 2px dashed #ccc; margin: 60px 0; }
+            /* Overviews & Insights Box */
+            blockquote { margin: 0 0 30px 0; padding: 25px 30px; background: #fff8e1; border-left: 6px solid #ffc107; border-radius: 0 8px 8px 0; font-size: 1.15em; line-height: 1.7; color: #5d4037; font-weight: 500; }
+            p:has(strong:contains("MD Insight")) { background: var(--highlight); padding: 30px; border-radius: 8px; border: 1px solid #c6dafc; margin-top: 30px; line-height: 1.8; font-size: 1.1em; color: #174ea6; }
             
-            /* Responsive layout for side-by-side lists if needed */
-            @media(min-width: 1024px) {
-                .dashboard-content { display: block; }
-            }
+            /* Lists */
+            .dashboard-content ol, .dashboard-content ul { padding-left: 20px; line-height: 1.8; font-size: 1.1em; color: #3c4043; }
+            .dashboard-content li { margin-bottom: 8px; }
+            
+            hr { border: 0; border-bottom: 1px solid var(--border); margin: 60px 0; }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="header-box">
-                <h1>주간 패션 트렌드</h1>
-                <div class="date">DATA COMPILED: 2026.03.15</div>
+                <div>
+                    <div style="font-size: 0.9em; letter-spacing: 2px; color: #9aa0a6; margin-bottom: 10px;">STRATEGIC MD REPORT</div>
+                    <h1>WEEKLY TREND & ACTION PLAN</h1>
+                </div>
+                <div class="date">DATA EXTRACTED: 2026.03.15</div>
             </div>
             <div class="dashboard-content">
-                <h2>👱‍♂️ [남성] 주간 패션 트렌드 랭킹</h2>
-<h3>🏆 검색량 높은 브랜드 TOP 10</h3>
+                <h2>📊 주간 패션 시장 종합 동향 (Market Overview)</h2>
+<p>전주 대비 남녀 모두 봄 시즌으로의 전환이 본격화됨. 남성 패션은 편안하면서도 스타일리시한 '셋업 수트' 및 '와이드 핏' 강세가 두드러지며, 기능성 스포츠웨어와 컨템포러리 캐주얼 브랜드의 인기가 지속됨. 여성 패션은 '미니멀', '올드머니', '긱시크' 등 다양한 스타일 코드가 혼재하며, 트위드, 스웨이드 자켓, 바람막이 등 간절기 아우터 및 원피스 아이템의 수요가 급증하는 추세 확인됨.</p>
+<hr />
+<h2>👱‍♂️ [남성] 주간 트렌드 분석 &amp; 액션 플랜</h2>
+<h3>🏆 급상승 브랜드 TOP 10 (검색량 기반)</h3>
 <ol>
-<li>나이키 (Nike)</li>
-<li>스톤아일랜드 (Stone Island)</li>
-<li>아미 (AMI)</li>
-<li>메종키츠네 (Maison Kitsuné)</li>
-<li>폴로 랄프로렌 (Polo Ralph Lauren)</li>
-<li>내셔널지오그래픽 (National Geographic)</li>
-<li>유니클로 (Uniqlo)</li>
-<li>CP컴퍼니 (C.P. Company)</li>
-<li>스투시 (Stussy)</li>
-<li>우영미 (Wooyoungmi)</li>
+<li><strong>스톤아일랜드</strong> (🔺고급 캐주얼웨어의 지속적인 수요, 시그니처 와펜 맨투맨/롱슬리브 인기)</li>
+<li><strong>CP컴퍼니</strong> (🔺시그니처 렌즈 와펜 맨투맨/티셔츠 등 독특한 디자인 선호)</li>
+<li><strong>아미 (AMI)</strong> (🔺하트로고 기반의 컨템포러리 캐주얼 감성 확고한 인기)</li>
+<li><strong>내셔널지오그래픽</strong> (🔺맨투맨, 긴팔 티셔츠 등 편안하면서도 브랜드 아이덴티티가 확실한 캐주얼 아이템 인기)</li>
+<li><strong>폴로 랄프로렌</strong> (🔺클래식 카라티, 하프집업 등 스테디셀러의 꾸준한 수요와 브랜드 파워)</li>
+<li><strong>나이키</strong> (🔺드라이핏 기능성 의류 및 스포츠웨어의 일상복으로의 확장)</li>
+<li><strong>언더아머</strong> (🔺스포츠 퍼포먼스 및 기능성 티셔츠의 꾸준한 수요)</li>
+<li><strong>우영미</strong> (🆕백로고 반팔티 등 디자이너 브랜드 특유의 개성 강한 아이템 신규 주목)</li>
+<li><strong>타미힐피거</strong> (🔺루즈핏 기본 티셔츠 등 편안하고 베이직한 캐주얼 아이템 수요 증가)</li>
+<li><strong>아페쎄 (A.P.C.)</strong> (🔺미니멀한 디자인과 로고 플레이 기반의 티셔츠/카라티 인기)</li>
 </ol>
-<h3>🔑 검색량 높은 키워드 TOP 10</h3>
+<h3>🔑 핵심 반응 키워드 TOP 10</h3>
 <ol>
 <li>와이드팬츠</li>
 <li>오버핏</li>
-<li>젠더리스 룩</li>
-<li>미니멀룩</li>
-<li>꾸안꾸 (꾸민 듯 안 꾸민 듯)</li>
-<li>맨투맨 코디</li>
-<li>가디건 스타일링</li>
-<li>봄 자켓 코디</li>
-<li>데일리룩</li>
-<li>기능성 의류</li>
+<li>루즈핏</li>
+<li>셋업수트</li>
+<li>긴팔티</li>
+<li>카라티</li>
+<li>맨투맨</li>
+<li>기능성</li>
+<li>젠더리스</li>
+<li>캐주얼</li>
 </ol>
-<h3>👕 검색량 높은 제품 TOP 10</h3>
+<h3>👕 주목해야 할 라이징 아이템 TOP 10 &amp; 기획 인사이트</h3>
 <ol>
-<li>맨투맨 (Sweatshirts)</li>
-<li>긴팔 티셔츠</li>
-<li>와이드팬츠</li>
-<li>반팔 티셔츠</li>
-<li>카라티 (Polo Shirts)</li>
-<li>셋업 수트 (Set-up Suits)</li>
-<li>가디건 (Cardigans)</li>
-<li>봄 자켓</li>
-<li>청바지 (Jeans)</li>
-<li>슬랙스 (Slacks)</li>
+<li><strong>와이드 팬츠:</strong> 슬림핏에서 와이드핏으로의 전환이 확실히 대세로 자리매김. 면 카고, 데님, 슬랙스 등 다양한 소재에서 와이드 실루엣 강조 필요.</li>
+<li><strong>셋업 수트:</strong> 비즈니스 캐주얼 및 하객룩, 데이트룩 등 활용도 높은 세미 와이드 셋업 수트 수요 급증. 스판 소재 및 밴딩 처리로 편안함 강조.</li>
+<li><strong>맨투맨:</strong> 루즈핏, 오버핏 기반의 맨투맨은 여전히 강력한 스테디셀러. 아치형 레터링, 프린팅 등 디자인 디테일 강화 필요.</li>
+<li><strong>긴팔 카라티:</strong> 간절기 아이템으로 라운드티, 브이넥과 함께 카라티의 검색량 상승. 단색 기본 디자인 외 헨리넥, PK 티셔츠 등 디자인 다양화 제안.</li>
+<li><strong>가디건:</strong> 봄 코디 필수템으로 니트 가디건 수요 확인. 럭셔리 가디건 및 오버핏 셔츠와 레이어드 코디 제안.</li>
+<li><strong>봄 자켓:</strong> 골덴 자켓, 스웨이드 자켓, 바시티 자켓, 항공점퍼 등 다양한 스타일의 봄 아우터 검색량 증가. 간절기에 적합한 보온성과 디자인 강조.</li>
+<li><strong>니트 (V넥, 폴라티):</strong> V넥 니트가 다시 부활 조짐. 간절기 이너 및 단품 착용 가능한 얇은 두께감 니트 기획 필요.</li>
+<li><strong>청바지 (일자, 세미와이드):</strong> 스트레이트 핏과 세미 와이드 핏 청바지가 봄 코디 핵심 아이템으로 부상. 다양한 워싱과 컬러 제안.</li>
+<li><strong>쇼츠:</strong> 여름 시즌을 선반영하는 키워드로 쇼츠 언급 시작. 트렌디한 디자인의 쇼츠 기획으로 여름 시즌 선점 기회.</li>
+<li><strong>바람막이:</strong> 환절기 아우터로 필수적인 바람막이 수요 지속. 기능성 소재, 경량성 강조, 다양한 컬러 옵션으로 기획.</li>
 </ol>
+<p><strong>💡 MD Insight (남성복 기획 적용점):</strong>
+-   <strong>핏과 소재의 유연성:</strong> '와이드', '오버핏', '루즈핏'은 이제 고착화된 트렌드. 셋업 수트나 캐주얼 아이템에 스판, 밴딩 등의 유연한 소재를 적극 도입하여 활동성과 편안함을 극대화하고, '옴니보어' 키워드에서 엿볼 수 있는 다양한 TPO(시간, 장소, 상황)에 매칭 가능한 디자인을 제안할 필요.
+-   <strong>'꾸안꾸' 기반의 컨템포러리 감성 강화:</strong> 고급스러운 캐주얼 브랜드(스톤아일랜드, CP컴퍼니, 아미)의 인기는 남성들이 '대충 입어도 멋있는' 룩을 추구함을 방증. 미니멀한 디자인에 시그니처 로고 플레이, 혹은 소재감으로 포인트를 주는 아이템을 기획하여 20대 후반~30대 남성들의 결핍 포인트(편안함, 센스 있는 스타일링)를 공략하는 것이 중요.</p>
 <hr />
-<h2>👩‍🦰 [여성] 주간 패션 트렌드 랭킹</h2>
-<h3>🏆 검색량 높은 브랜드 TOP 10</h3>
+<h2>👩‍🦰 [여성] 주간 트렌드 분석 &amp; 액션 플랜</h2>
+<h3>🏆 급상승 브랜드 TOP 10 (검색량 기반)</h3>
 <ol>
-<li>나이키 (Nike)</li>
-<li>MLB</li>
-<li>유니클로 (Uniqlo)</li>
-<li>아디다스 (Adidas)</li>
-<li>바버 (Barbour)</li>
-<li>찰스앤키스 (Charles &amp; Keith)</li>
-<li>마리떼 프랑소와 저버 (Marithe Francois Girbaud)</li>
-<li>마뗑킴 (Matin Kim)</li>
-<li>코치 (Coach)</li>
-<li>로엠 (Roem)</li>
+<li><strong>나이키</strong> (🔺바람막이, 원피스 등 기능성 액티브웨어와 캐주얼 아이템 전반에 걸친 인기)</li>
+<li><strong>로엠 (ROEM)</strong> (🔺트위드 자켓, 원피스 등 여성스러운 간절기 아이템 수요 증가)</li>
+<li><strong>자라 (ZARA)</strong> (🔺더블 브레스티드 오버사이즈 블레이저 등 트렌디한 자켓/아우터 시장 선도)</li>
+<li><strong>MLB</strong> (🔺빈티지 볼캡, 바람막이 등 스트릿 캐주얼 트렌드에 발맞춰 지속적인 인기)</li>
+<li><strong>보카바카 (VOCAVACA)</strong> (🆕올드머니룩 코디 아이템으로 신규 주목, 클래식하고 우아한 스타일 제안)</li>
+<li><strong>아디다스</strong> (🔺후리스 집업 등 편안한 데일리 캐주얼웨어 수요 지속)</li>
+<li><strong>유니클로</strong> (🔺에어리즘, 경량 바람막이 등 기본템 및 기능성 아이템으로 강세)</li>
+<li><strong>미쏘 (MIXXO)</strong> (🔺오버핏 테일러드 자켓 등 실용적이면서 포멀한 디자인 선호)</li>
+<li><strong>지오다노</strong> (🔺경량 패딩 자켓 등 간절기 아우터로의 수요 확인)</li>
+<li><strong>SOUP</strong> (🆕헤링본, 싱글 크롭 자켓 등 세련되고 트렌디한 아우터 디자인으로 신규 주목)</li>
 </ol>
-<h3>🔑 검색량 높은 키워드 TOP 10</h3>
+<h3>🔑 핵심 반응 키워드 TOP 10</h3>
 <ol>
 <li>미니멀룩</li>
 <li>올드머니룩</li>
-<li>너드룩/긱시크룩</li>
-<li>꾸안꾸 (꾸민 듯 안 꾸민 듯)</li>
-<li>오버핏</li>
-<li>하객룩</li>
-<li>데일리룩</li>
-<li>트위드 스타일</li>
-<li>셔츠 코디</li>
-<li>레이어드룩</li>
+<li>긱시크룩</li>
+<li>크롭</li>
+<li>원피스</li>
+<li>트위드</li>
+<li>스웨이드</li>
+<li>바람막이</li>
+<li>셋업</li>
+<li>꾸안꾸</li>
 </ol>
-<h3>👗 검색량 높은 제품 TOP 10</h3>
+<h3>👗 주목해야 할 라이징 아이템 TOP 10 &amp; 기획 인사이트</h3>
 <ol>
-<li>원피스 (Dresses)</li>
-<li>투피스/셋업 (Two-piece/Set-up)</li>
-<li>트위드 자켓</li>
-<li>롱 스커트</li>
-<li>셔츠</li>
-<li>가디건 (Cardigans)</li>
-<li>슬랙스 (Slacks)</li>
-<li>청바지 (Jeans)</li>
-<li>핸드백 (Handbags)</li>
-<li>스니커즈 (Sneakers)</li>
+<li><strong>트위드 자켓/셋업:</strong> 올드머니룩 트렌드와 맞물려 클래식하면서도 우아한 트위드 자켓과 투피스 셋업의 인기가 매우 높음. 크롭 기장이나 파스텔 톤 등 현대적인 재해석 기획 필요.</li>
+<li><strong>오버사이즈 블레이저:</strong> 자라를 필두로 한 오버핏 더블 브레스티드 블레이저가 여자 코디 필수템으로 자리매김. 미니멀룩, 꾸안꾸룩에 활용 가능한 베이직 컬러 확장 및 소재 차별화.</li>
+<li><strong>바람막이:</strong> 간절기 필수 아우터이자 애슬레저 룩의 대표 아이템. 경량성, 방수/방풍 기능성 강화, 크롭/루즈핏 등 다양한 실루엣 제안.</li>
+<li><strong>스웨이드 자켓:</strong> 봄 코디에 활용하기 좋은 스웨이드 자켓 언급 증가. 헌팅 자켓 스타일, 라이더 자켓 변형 등 디자인 다양화로 소비자 선택의 폭 확대.</li>
+<li><strong>크롭티:</strong> 상의는 짧고 하의는 길게 입는 스타일 트렌드 지속. 데일리 후드티, 맨투맨, 티셔츠 등 다양한 종류의 크롭 디자인 기획.</li>
+<li><strong>스트라이프 셔츠:</strong> 여자 봄옷 코디의 기본템으로 스트라이프 셔츠 주목. 오버핏, 유니크한 컬러 조합, 레이어드 활용도를 강조한 기획.</li>
+<li><strong>가디건:</strong> 봄 코디 치트키 아이템. 크롭 볼레로 가디건, 루즈핏 니트 가디건 등 다양한 스타일로 데이트룩, 오피스룩 공략.</li>
+<li><strong>플리츠 원피스/스커트:</strong> 편안하면서도 우아한 플리츠 디자인의 롱 원피스 및 스커트 수요. 빅사이즈, 냉장고 소재 등으로 착용감 강조.</li>
+<li><strong>버뮤다 팬츠:</strong> 2025 여름 패션 트렌드로 부상. 여유 있는 핏과 다양한 소재(린넨, 면)로 미리 여름 시즌 아이템 기획 준비.</li>
+<li><strong>안경:</strong> '긱시크룩'의 핵심 아이템. 패션 소품으로서의 안경 (뿔테, 블루라이트 차단 기능 등)을 코디 아이템으로 제안.</li>
 </ol>
+<p><strong>💡 MD Insight (여성복 기획 적용점):</strong>
+-   <strong>다중 트렌드 융합 및 실용성 강화:</strong> '미니멀', '올드머니', '긱시크' 등 다양한 패션 코드를 특정 아이템에 녹여내는 전략 필요. 예를 들어, 미니멀한 디자인의 트위드 자켓에 오버핏 실루엣을 적용하거나, 긱시크룩에 활용 가능한 오피스룩 아이템을 제안하는 방식. 동시에 '꾸안꾸' 트렌드를 반영하여 편안하면서도 격식 있는 자리까지 커버 가능한 다용도 아이템 기획이 중요.
+-   <strong>간절기 아우터의 다변화 및 소재 혁신:</strong> 봄 시즌 아우터는 단순한 보온 기능을 넘어 스타일의 완성도를 높이는 핵심 아이템. 트위드, 스웨이드, 바람막이 등 소재별 특성을 살린 디자인 차별화와 함께, 경량성, 생활 방수 등 기능성을 강화한 제품으로 급변하는 날씨에 대비하는 실용적인 소구점 마련이 필수적임.</p>
             </div>
         </div>
     </body>
