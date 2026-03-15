@@ -1,5 +1,4 @@
 requests
 beautifulsoup4
 google-generativeai
-pytrends
-lxml
+markdown
