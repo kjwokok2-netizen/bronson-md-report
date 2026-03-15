@@ -3,98 +3,124 @@
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <title>Bronson MD Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Weekly Fashion Trend Ranking</title>
         <style>
             @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-            :root { --primary: #2c3e50; --accent: #c0392b; --bg: #f8f9fa; --text: #333; }
-            body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px; }
-            .dashboard { max-width: 1000px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
-            .header { background: var(--primary); color: #fff; padding: 30px 40px; display: flex; justify-content: space-between; align-items: center; }
-            .header h1 { margin: 0; font-size: 1.8em; letter-spacing: 1px; font-weight: 700; }
-            .header .date { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 4px; font-size: 0.9em; }
+            :root { --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21; --accent: #1877f2; --border: #e4e6eb; }
+            body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
+            .container { max-width: 1200px; margin: 0 auto; }
             
-            .content-area { padding: 40px; }
-            /* 렌더링된 마크다운 스타일링 */
-            .content-area h2 { color: var(--primary); font-size: 1.4em; margin-top: 40px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-            .content-area h2:first-child { margin-top: 0; }
-            .content-area p, .content-area li { line-height: 1.8; font-size: 1.05em; color: #444; }
-            .content-area ul { padding-left: 20px; margin-bottom: 30px; }
+            /* Header */
+            .header-box { background: var(--card); padding: 40px; border-radius: 16px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 40px; border-top: 6px solid #1a1a1a; }
+            .header-box h1 { margin: 0 0 10px 0; font-size: 2.5em; letter-spacing: -1px; font-weight: 800; }
+            .header-box .date { color: #65676b; font-weight: 600; font-size: 1.1em; }
+
+            /* Content Grid */
+            .dashboard-content { display: flex; flex-direction: column; gap: 40px; }
             
-            /* 표(Table) 압도적 퀄리티 적용 */
-            .content-area table { width: 100%; border-collapse: collapse; margin: 30px 0; font-size: 1em; background-color: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.03); }
-            .content-area th, .content-area td { padding: 16px 20px; text-align: left; border-bottom: 1px solid #eee; line-height: 1.5; }
-            .content-area th { background-color: #f1f3f5; color: var(--primary); font-weight: 700; border-bottom: 2px solid #dee2e6; }
-            .content-area tbody tr:hover { background-color: #f8f9fa; }
+            /* Markdown Styling for Ranking Boards */
+            .dashboard-content h2 { text-align: center; font-size: 2em; margin: 40px 0 20px 0; padding-bottom: 15px; border-bottom: 3px solid #1a1a1a; }
+            .dashboard-content h3 { color: var(--accent); font-size: 1.4em; margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; }
+            .dashboard-content ol { background: var(--card); padding: 30px 30px 30px 50px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin: 0; border: 1px solid var(--border); }
+            .dashboard-content li { padding: 12px 0; border-bottom: 1px solid #f1f1f1; font-size: 1.15em; font-weight: 500; color: #333; }
+            .dashboard-content li:last-child { border-bottom: none; padding-bottom: 0; }
             
-            strong { color: var(--accent); }
+            hr { border: 0; border-bottom: 2px dashed #ccc; margin: 60px 0; }
+            
+            /* Responsive layout for side-by-side lists if needed */
+            @media(min-width: 1024px) {
+                .dashboard-content { display: block; }
+            }
         </style>
     </head>
     <body>
-        <div class="dashboard">
-            <div class="header">
-                <h1>BRONSON MARKET INTELLIGENCE</h1>
-                <span class="date">UPDATE : 2026.03.15</span>
+        <div class="container">
+            <div class="header-box">
+                <h1>주간 패션 트렌드</h1>
+                <div class="date">DATA COMPILED: 2026.03.15</div>
             </div>
-            <div class="content-area">
-                <h2>1. 📈 주간 트렌드 급상승 키워드 &amp; 아이템</h2>
-<ul>
-<li><strong>아메카지/워크웨어 스타일:</strong> 통큰 바지(와이드/릴렉스핏 포함), 카고 팬츠, 더블니 카펜터 팬츠 등 하의 아이템과 M65, N-1 덱자켓, MA-1 등 복각 기반의 밀리터리 자켓 및 코듀로이 자켓의 관심이 높게 확인됨.</li>
-<li><strong>핏:</strong> 와이드핏, 릴렉스드 핏 등 여유로운 실루엣의 팬츠와 오버핏/복각핏 자켓이 트렌드로 부상 중임.</li>
-<li><strong>소재:</strong> 코듀로이, 덕(Duck) 원단, 백사틴, 고밀도 트윌, 셀비지 데님, 립스탑 등 견고하고 내구성이 높은 워크웨어 및 밀리터리 기반의 소재가 주로 언급됨.</li>
-<li><strong>데님:</strong> 워싱이 예쁜 데님, 셀비지 데님, 데님 셋업 등 데님 아이템에 대한 관심이 지속됨.</li>
-</ul>
-<h2>2. ⚔️ 경쟁사 vs 오리지널 브랜드 반응 분석</h2>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">브랜드 구분</th>
-<th style="text-align: left;">주요 언급 브랜드</th>
-<th style="text-align: left;">소비자 긍정 반응</th>
-<th style="text-align: left;">소비자 결핍/불만 (Pain Point)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;">국내 도메스틱</td>
-<td style="text-align: left;">에스피오나지, 프리즘웍스, 아웃스탠딩, 무신사 스탠다드 워크웨어, 플랙, 디키즈</td>
-<td style="text-align: left;">게러지 세일 가격 만족, 아메카지 입문 용이, 가성비 뛰어남, 워크웨어 디테일 구현 및 내구성 우수, 프리미엄 데님 원단 사용</td>
-<td style="text-align: left;">세일 시 L/XL 사이즈 물량 부족, 원단 질감(가디건 니트 등) 까슬거림, 사이즈감 애매함, 부자재(단추) 아쉬움, 복각 MA-1 무겁다는 의견, 데님 단추 뻑뻑함</td>
-</tr>
-<tr>
-<td style="text-align: left;">해외/오리지널</td>
-<td style="text-align: left;">리얼맥코이, RRL, 웨어하우스, 오어슬로우, 오디너리핏츠 (일본)</td>
-<td style="text-align: left;">복각 브랜드 1티어 퀄리티 만족, RRL 데님/베스트 디자인 및 중고 가격 방어 우수, 웨어하우스 데님 워싱 및 핏 만족도 높음, 오어슬로우/오디너리핏츠 데님 무난한 착용감</td>
-<td style="text-align: left;">높은 가격(접근성 낮음), 특정 아이템 재고 구하기 어려움, 사이즈(복각핏)가 작거나 애매함, 헨리넥 늘어짐, 데님 단추 뻑뻑함, 안감 디자인 밋밋함, 엉뿔/삼포 발생</td>
-</tr>
-</tbody>
-</table>
-<h2>3. 🎯 브론슨(Bronson) 상품 기획 Action Plan</h2>
+            <div class="dashboard-content">
+                <h2>👱‍♂️ [남성] 주간 패션 트렌드 랭킹</h2>
+<h3>🏆 검색량 높은 브랜드 TOP 10</h3>
 <ol>
-<li>
-<p><strong>다양한 체형을 고려한 '릴렉스드 복각핏' 개발 및 L/XL 사이즈 물량 확대:</strong></p>
-<ul>
-<li>국내외 경쟁 브랜드에서 지적되는 '애매한 사이즈감', '복각핏이 작다'는 불만을 해소하기 위해, 브론슨의 헤리티지는 유지하되 데일리 착용에 적합한 여유로운 실루엣의 복각 아이템(워크 팬츠, 밀리터리 자켓) 개발을 추진함.</li>
-<li>특히, 통큰 바지, 카고 팬츠 등 주간 트렌드 급상승 아이템은 와이드/릴렉스드 핏으로 기획하여 소비자 선호도를 반영함.</li>
-<li>세일 시 L/XL 사이즈 물량 부족 문제에 대응하여 해당 사이즈의 생산 및 재고 확보에 더욱 집중함.</li>
-</ul>
-</li>
-<li>
-<p><strong>견고함과 착용감을 동시에 잡는 프리미엄 원단 및 부자재 소싱 강화:</strong></p>
-<ul>
-<li>원단의 '까슬거림', '단추 뻑뻑함', '안감 디자인 밋밋함' 등의 소비자 결핍을 공략하여, 브론슨 제품의 품질 및 만족도를 높임.</li>
-<li>기존의 두꺼운 워크웨어/밀리터리 원단(덕, 트윌 등) 외에 몰스킨과 같은 부드러운 소재나 고급 백사틴/코튼 트윌 등 피부에 직접 닿는 부분의 촉감을 개선한 원단 소싱을 우선함.</li>
-<li>RRL의 안감 디자인 아쉬움 지적을 참고하여 자켓류의 안감에 브론슨만의 헤리티지를 담은 패턴을 적용하여 시각적 차별화를 꾀함.</li>
-<li>데님류는 고품질 부자재를 사용하고 워싱 공정을 강화하여 단추 뻑뻑함을 개선하고 부드러운 착용감을 제공함.</li>
-</ul>
-</li>
-<li>
-<p><strong>해외 복각/오리지널 브랜드의 대안으로서 '합리적 가격의 고품질 복각' 포지셔닝 강화:</strong></p>
-<ul>
-<li>리얼맥코이, RRL, 웨어하우스 등 해외 브랜드의 높은 가격과 재고 접근성 문제를 공략, 브론슨이 유사한 헤리티지 및 품질을 갖추면서도 합리적인 가격대의 복각 아이템을 제공하는 대안임을 강조함.</li>
-<li>특히 웨어하우스 데님 자켓의 '재고 구하기 어려움', RRL 헨리넥 및 카고 팬츠의 '높은 가격' 등의 페인 포인트를 해소할 수 있는 브론슨만의 데님 자켓, 헨리넥 셔츠, 카고 팬츠 등을 주력 상품으로 기획함.</li>
-<li>이 과정에서 브론슨 MA-1에 대한 '무겁다'는 기존 피드백을 수용, 데일리 착용에 적합한 중량감과 유연성을 갖춘 소재를 연구하여 '고품질 복각'과 '실용적 편안함'의 균형을 이룸.</li>
-</ul>
-</li>
+<li>나이키 (Nike)</li>
+<li>스톤아일랜드 (Stone Island)</li>
+<li>아미 (AMI)</li>
+<li>메종키츠네 (Maison Kitsuné)</li>
+<li>폴로 랄프로렌 (Polo Ralph Lauren)</li>
+<li>내셔널지오그래픽 (National Geographic)</li>
+<li>유니클로 (Uniqlo)</li>
+<li>CP컴퍼니 (C.P. Company)</li>
+<li>스투시 (Stussy)</li>
+<li>우영미 (Wooyoungmi)</li>
+</ol>
+<h3>🔑 검색량 높은 키워드 TOP 10</h3>
+<ol>
+<li>와이드팬츠</li>
+<li>오버핏</li>
+<li>젠더리스 룩</li>
+<li>미니멀룩</li>
+<li>꾸안꾸 (꾸민 듯 안 꾸민 듯)</li>
+<li>맨투맨 코디</li>
+<li>가디건 스타일링</li>
+<li>봄 자켓 코디</li>
+<li>데일리룩</li>
+<li>기능성 의류</li>
+</ol>
+<h3>👕 검색량 높은 제품 TOP 10</h3>
+<ol>
+<li>맨투맨 (Sweatshirts)</li>
+<li>긴팔 티셔츠</li>
+<li>와이드팬츠</li>
+<li>반팔 티셔츠</li>
+<li>카라티 (Polo Shirts)</li>
+<li>셋업 수트 (Set-up Suits)</li>
+<li>가디건 (Cardigans)</li>
+<li>봄 자켓</li>
+<li>청바지 (Jeans)</li>
+<li>슬랙스 (Slacks)</li>
+</ol>
+<hr />
+<h2>👩‍🦰 [여성] 주간 패션 트렌드 랭킹</h2>
+<h3>🏆 검색량 높은 브랜드 TOP 10</h3>
+<ol>
+<li>나이키 (Nike)</li>
+<li>MLB</li>
+<li>유니클로 (Uniqlo)</li>
+<li>아디다스 (Adidas)</li>
+<li>바버 (Barbour)</li>
+<li>찰스앤키스 (Charles &amp; Keith)</li>
+<li>마리떼 프랑소와 저버 (Marithe Francois Girbaud)</li>
+<li>마뗑킴 (Matin Kim)</li>
+<li>코치 (Coach)</li>
+<li>로엠 (Roem)</li>
+</ol>
+<h3>🔑 검색량 높은 키워드 TOP 10</h3>
+<ol>
+<li>미니멀룩</li>
+<li>올드머니룩</li>
+<li>너드룩/긱시크룩</li>
+<li>꾸안꾸 (꾸민 듯 안 꾸민 듯)</li>
+<li>오버핏</li>
+<li>하객룩</li>
+<li>데일리룩</li>
+<li>트위드 스타일</li>
+<li>셔츠 코디</li>
+<li>레이어드룩</li>
+</ol>
+<h3>👗 검색량 높은 제품 TOP 10</h3>
+<ol>
+<li>원피스 (Dresses)</li>
+<li>투피스/셋업 (Two-piece/Set-up)</li>
+<li>트위드 자켓</li>
+<li>롱 스커트</li>
+<li>셔츠</li>
+<li>가디건 (Cardigans)</li>
+<li>슬랙스 (Slacks)</li>
+<li>청바지 (Jeans)</li>
+<li>핸드백 (Handbags)</li>
+<li>스니커즈 (Sneakers)</li>
 </ol>
             </div>
         </div>
