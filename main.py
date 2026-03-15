@@ -15,13 +15,14 @@ if not GEMINI_KEY: exit()
 genai.configure(api_key=GEMINI_KEY)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-# 2. 데이터 수집 (수집량 극대화)
-def get_naver_search(keyword, target="shop"):
+# 2. 데이터 수집 모듈 (네이버 API & 유튜브)
+def get_naver_search(keyword, target="cafearticle"):
     client_id = os.environ.get("NAVER_CLIENT_ID")
     client_secret = os.environ.get("NAVER_CLIENT_SECRET")
     if not client_id: return ""
     encText = urllib.parse.quote(keyword)
-    url = f"https://openapi.naver.com/v1/search/{target}.json?query={encText}&display=20" # 데이터 확보량 최대치
+    # 데이터 밀도를 위해 수집량 유지 (20개)
+    url = f"https://openapi.naver.com/v1/search/{target}.json?query={encText}&display=20"
     request_obj = urllib.request.Request(url)
     request_obj.add_header("X-Naver-Client-Id", client_id)
     request_obj.add_header("X-Naver-Client-Secret", client_secret)
@@ -29,59 +30,49 @@ def get_naver_search(keyword, target="shop"):
         response = urllib.request.urlopen(request_obj)
         if response.getcode() == 200:
             data = json.loads(response.read().decode('utf-8'))
-            clean = lambda x: x.replace('<b>', '').replace('</b>', '').replace('&quot;', '"').replace('&#39;', "'")
-            return "\n".join([f"- {clean(i['title'])}: {clean(i.get('description', ''))[:100]}" for i in data['items']])
+            clean = lambda x: x.replace('<b>', '').replace('</b>', '').replace('&quot;', '"')
+            return "\n".join([f"[{target}] {clean(i['title'])}: {clean(i.get('description', ''))[:100]}" for i in data['items']])
     except: return ""
     return ""
 
-def get_youtube_data(keyword):
-    encoded_query = urllib.parse.quote(keyword)
-    url = f"https://www.youtube.com/results?search_query={encoded_query}"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        titles = re.findall(r'"title":\{"runs":\[\{"text":"([^"]+)"\}', response.text)
-        return " / ".join(list(set([t for t in titles if len(t) > 5]))[:7])
-    except: return ""
-
-# 3. 데이터 취합 (주완 MD 지정 모든 키워드 포함)
+# 3. 데이터 취합 (브론슨을 포함한 전체 시장 쿼리)
 def collect_data():
-    target_keywords = [
+    # 브론슨을 포함하여 검색하되, 리포트 분석의 대조군으로 활용함
+    queries = [
+        "남자 아메카지 코디", "밀리터리 복각 자켓", "워크웨어 팬츠", 
         "아웃스탠딩", "에스피오나지", "프리즘웍스", "브론슨 의류", 
-        "리얼맥코이", "버즈릭슨", "더블알엘 RRL", "웨어하우스 복각", "오어슬로우", "오디너리핏츠",
-        "남자 아메카지 코디", "밀리터리 복각", "워크웨어 팬츠", "고아캐드", "브랜디드"
+        "리얼맥코이", "버즈릭슨", "더블알엘 RRL", "웨어하우스 복각", 
+        "오어슬로우", "오디너리핏츠", "엔지니어드가먼츠", "고아캐드", "브랜디드"
     ]
-    all_info = []
-    for kw in target_keywords:
-        all_info.append(f"### [KEYWORD DATA: {kw}] ###")
-        all_info.append(get_naver_search(kw, "shop"))
-        all_info.append(get_naver_search(kw, "cafearticle"))
-        all_info.append(get_youtube_data(kw))
-        all_info.append("\n")
-    return "\n".join(all_info)
+    raw_data = []
+    for q in queries:
+        raw_data.append(get_naver_search(q, "cafearticle"))
+        raw_data.append(get_naver_search(q, "blog"))
+    return "\n".join(raw_data)
 
-# 4. 리포트 생성 (브랜드 누락 금지 프롬프트)
+# 4. 리포트 생성 (외부 시장 통찰 중심)
 def generate_report(data):
     today = datetime.now()
     w_range = f"{(today - timedelta(days=7)).strftime('%m/%d')} ~ {today.strftime('%m/%d')}"
     
     prompt = f"""
-    당신은 브론슨(Bronson)의 수석 MD입니다. 제공된 데이터를 기반으로 리포트를 작성하되, 아래 지시를 어길 시 큰 손실이 발생합니다.
+    당신은 브랜드 '브론슨(Bronson)'의 수석 전략 MD입니다. 
+    수집된 전체 시장 데이터를 분석하여 실무용 리포트를 작성하세요.
 
-    [절대 규칙]
-    1. 데이터에 포함된 '모든 브랜드'의 분석 내용을 누락 없이 포함하세요. (아웃스탠딩, 에스피오나지, 프리즘웍스, 브론슨, 맥코이, 버즈릭슨, RRL, 웨어하우스, 오어슬로우, 오디너리핏츠)
-    2. '오디너리핏츠'는 반드시 일본 브랜드 섹션에 넣으세요.
-    3. 주간(최근 7일) 핵심 이슈와 이번 달 전체 전략 섹션을 명확히 구분하세요.
-    4. 스르비 언급, 발신/수신 등 모든 불필요한 수식어는 제거하세요.
-    5. 가독성을 위해 카드형 레이아웃(<div class="card">)과 강조 배지(<span class="badge">)를 적극 사용하세요.
+    [핵심 지침]
+    1. 데이터 분석 범위: 브론슨을 포함한 모든 수집 데이터를 활용하되, 리포트 결과에서 '브론슨 자사 제품 모니터링' 섹션은 제외할 것.
+    2. 분석의 목적: 외부 경쟁사 동향과 커뮤니티(고아캐드, 브랜디드 등)의 실시간 여론을 분석하여 브론슨이 취해야 할 '전략적 우위'를 도출하는 것임.
+    3. 주간/월간 통합: 최근 7일간의 폭발적인 이슈 키워드와 이번 달 전체를 관통하는 흐름을 구분하여 작성할 것.
+    4. 문체: 전문 비즈니스 개조식(~함, ~임)을 사용하고, '습니다'체는 배제할 것.
+    5. 오디너리핏츠는 일본 브랜드로 분류할 것.
 
-    [원본 데이터]
+    [수집 데이터]
     {data}
     """
     response = model.generate_content(prompt)
     return response.text.replace('```html', '').replace('```', '')
 
-# 5. 디자인 UI (사이드바 및 고밀도 카드 적용)
+# 5. 세련된 실무 대시보드 UI
 def save_to_html(content):
     now = datetime.now().strftime('%Y.%m.%d')
     html_template = f"""
@@ -89,35 +80,34 @@ def save_to_html(content):
     <html lang="ko">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bronson Intelligence Center</title>
+        <title>Bronson Market Intelligence Dashboard</title>
         <style>
             @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-            :root {{ --primary: #c0392b; --dark: #1a1a1a; --bg: #f2f2f2; }}
-            body {{ font-family: 'Pretendard', sans-serif; background: var(--bg); color: #333; margin: 0; display: flex; }}
-            nav {{ width: 260px; background: var(--dark); height: 100vh; position: fixed; padding: 40px 20px; color: #fff; }}
-            nav h2 {{ color: var(--primary); font-size: 1.1em; letter-spacing: 2px; }}
-            main {{ flex: 1; margin-left: 260px; padding: 50px 80px; }}
-            header {{ border-bottom: 4px solid var(--dark); padding-bottom: 20px; margin-bottom: 50px; }}
-            .card {{ background: #fff; border-radius: 8px; padding: 40px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #ddd; }}
-            .card h2 {{ font-size: 1.7em; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 15px; color: var(--dark); }}
-            .badge {{ background: #fff0f0; color: var(--primary); padding: 3px 10px; border-radius: 4px; font-weight: 700; font-size: 0.85em; border: 1px solid #ffcccc; }}
-            p, li {{ line-height: 1.9; font-size: 1.1em; }}
-            .youtube-item {{ color: #7f8c8d; font-size: 0.9em; font-style: italic; }}
+            :root {{ --primary: #c0392b; --dark: #121212; --bg: #f5f6fa; }}
+            body {{ font-family: 'Pretendard', sans-serif; background: var(--bg); color: #333; margin: 0; padding: 0; }}
+            .wrapper {{ max-width: 1200px; margin: 40px auto; padding: 0 20px; }}
+            .header {{ background: var(--dark); color: #fff; padding: 40px; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: flex-end; }}
+            .header h1 {{ margin: 0; font-size: 2.2em; letter-spacing: -1.5px; }}
+            .header .info {{ text-align: right; opacity: 0.7; font-weight: 600; }}
+            .main-report {{ background: #fff; padding: 60px; border-radius: 0 0 8px 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }}
+            .content h2 {{ font-size: 1.7em; color: var(--primary); margin-top: 50px; border-bottom: 2px solid #f1f2f6; padding-bottom: 15px; }}
+            .content p, .content li {{ line-height: 1.9; font-size: 1.1em; color: #444; }}
+            .strategy-highlight {{ background: #fff5f5; border-left: 5px solid var(--primary); padding: 30px; margin-top: 40px; border-radius: 4px; }}
+            .strategy-highlight h3 {{ margin-top: 0; color: var(--primary); }}
         </style>
     </head>
     <body>
-        <nav>
-            <h2>BRONSON<br>INTELLIGENCE</h2>
-            <p style="font-size: 0.8em; opacity: 0.5;">Weekly & Monthly Data Analysis</p>
-        </nav>
-        <main>
-            <header>
-                <h1 style="margin:0; font-size: 2.5em; letter-spacing: -2px;">STRATEGIC MD REPORT</h1>
-                <div style="margin-top:10px; font-weight:700; color:#888;">UPDATE: {now}</div>
-            </header>
-            {content}
-        </main>
+        <div class="wrapper">
+            <div class="header">
+                <h1>MARKET INTELLIGENCE</h1>
+                <div class="info">UPDATE: {now}<br>FOR BRONSON STRATEGY TEAM</div>
+            </div>
+            <main class="main-report">
+                <div class="content">
+                    {content}
+                </div>
+            </main>
+        </div>
     </body>
     </html>
     """
@@ -126,7 +116,5 @@ def save_to_html(content):
 
 if __name__ == "__main__":
     raw_info = collect_data()
-    with open("raw_data_log.txt", "w", encoding="utf-8") as f:
-        f.write(raw_info)
     report_text = generate_report(raw_info)
     save_to_html(report_text)
