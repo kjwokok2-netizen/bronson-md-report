@@ -22,10 +22,12 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run script
+- name: Run script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}         # 네이버 아이디 허락
-          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }} # 네이버 비밀번호 허락
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }} # 추가된 부분
         run: python main.py
 
       - name: Commit and Push changes
